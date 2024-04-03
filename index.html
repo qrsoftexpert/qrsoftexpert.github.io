@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Código QR</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+
+    #qr-container {
+      margin-top: 20px;
+    }
+
+    #qr-code {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: 100%;
+    }
+
+    #generar-qr-btn {
+      margin-top: 10px;
+    }
+
+    #imprimir-btn {
+      margin-top: 10px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #qr-container, #qr-container * {
+        visibility: visible;
+      }
+      #generar-qr-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Generador de Código QR</h1>
+  
+  <label for="identificador">Ingrese el identificador:</label>
+  <input type="text" id="identificador" placeholder="20009-TI--24-00022">
+  <button id="generar-qr-btn" onclick="generarQR()">Generar Código QR</button>
+
+  <div id="qr-container" style="display: none;">
+    <p id="identificador-imprimir"></p>
+    <div id="qr-code"></div>
+    <button id="imprimir-btn" onclick="imprimirQR()">Imprimir Código QR</button>
+  </div>
+
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+    function generarQR() {
+      const identificador = document.getElementById('identificador').value.trim();
+      const qrContainer = document.getElementById('qr-container');
+      const qrCodeContainer = document.getElementById('qr-code');
+      const identificadorImprimir = document.getElementById('identificador-imprimir');
+
+      if (identificador !== '') {
+        const fechaHoraActual = obtenerFechaHoraActual();
+        const enlaceBase = 'https://softexpert.permoda.co/se/v58515/workflow/workflow_data.php?workflowId=';
+        const enlaceCompleto = enlaceBase + identificador + '&fechaHora=' + fechaHoraActual;
+
+        qrContainer.style.display = 'block';
+        qrCodeContainer.innerHTML = ''; // Limpiar contenido anterior
+        new QRCode(qrCodeContainer, enlaceCompleto);
+
+        // Mostrar el identificador, fecha y hora
+        identificadorImprimir.textContent = `${identificador},  FECHA: ${fechaHoraActual}`;
+      } else {
+        alert('Ingrese un identificador válido.');
+      }
+    }
+
+    function obtenerFechaHoraActual() {
+      const ahora = new Date();
+      const fecha = ahora.toISOString().split('T')[0];
+      const horas = ahora.getHours().toString().padStart(2, '0');
+      const minutos = ahora.getMinutes().toString().padStart(2, '0');
+      const segundos = ahora.getSeconds().toString().padStart(2, '0');
+      return `${fecha} ${horas}:${minutos}:${segundos}`;
+    }
+
+    function imprimirQR() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
